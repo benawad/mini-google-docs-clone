@@ -1,32 +1,16 @@
-import React, { useState } from "react";
-import { Editor } from "slate-react";
-import { Value } from "slate";
-
-const initialValue = Value.fromJSON({
-  document: {
-    nodes: [
-      {
-        object: "block",
-        type: "paragraph",
-        nodes: [
-          {
-            object: "text",
-            leaves: [
-              {
-                text: "A line of text in a paragraph."
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-} as any);
+import React from "react";
+import { SyncingEditor } from "./SyncingEditor";
 
 const App = () => {
-  const [value, setValue] = useState(initialValue);
-
-  return <Editor value={value} onChange={opts => setValue(opts.value)} />;
+  return (
+    <div>
+      <SyncingEditor />
+      <br />
+      <SyncingEditor />
+      <br />
+      <SyncingEditor />
+    </div>
+  );
 };
 
 export default App;
