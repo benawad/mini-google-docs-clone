@@ -40,41 +40,79 @@ export const SyncingEditor: React.FC<Props> = ({ groupId }) => {
   }, [groupId]);
 
   return (
-    <Editor
-      ref={editor}
-      style={{
-        backgroundColor: "#fafafa",
-        maxWidth: 800,
-        minHeight: 150
-      }}
-      value={value}
-      onChange={opts => {
-        setValue(opts.value);
+    <>
+      <button
+        onMouseDown={e => {
+          e.preventDefault();
+          // bold selected text
+          editor.current!.toggleMark("bold");
+        }}
+      >
+        bold
+      </button>
+      <button
+        onMouseDown={e => {
+          e.preventDefault();
+          // bold selected text
+          editor.current!.toggleMark("italic");
+        }}
+      >
+        italic
+      </button>
+      <Editor
+        ref={editor}
+        style={{
+          backgroundColor: "#fafafa",
+          maxWidth: 800,
+          minHeight: 150
+        }}
+        value={value}
+        renderMark={(props, _editor, next) => {
+          if (props.mark.type === "bold") {
+            return (
+              <strong
+                style={{
+                  letterSpacing: 1,
+                  color: "pink"
+                }}
+              >
+                {props.children}
+              </strong>
+            );
+          } else if (props.mark.type === "italic") {
+            return <em>{props.children}</em>;
+          }
 
-        const ops = opts.operations
-          .filter(o => {
-            if (o) {
-              return (
-                o.type !== "set_selection" &&
-                o.type !== "set_value" &&
-                (!o.data || !o.data.has("source"))
-              );
-            }
+          return next();
+        }}
+        onChange={opts => {
+          setValue(opts.value);
 
-            return false;
-          })
-          .toJS()
-          .map((o: any) => ({ ...o, data: { source: "one" } }));
+          const ops = opts.operations
+            .filter(o => {
+              if (o) {
+                return (
+                  o.type !== "set_selection" &&
+                  o.type !== "set_value" &&
+                  (!o.data || !o.data.has("source"))
+                );
+              }
 
-        if (ops.length && !remote.current) {
-          socket.emit("new-operations", {
-            editorId: id.current,
-            ops,
-            value: opts.value.toJSON(),
-            groupId
-          });
-        }
-      }}
-    />
+              return false;
+            })
+            .toJS()
+            .map((o: any) => ({ ...o, data: { source: "one" } }));
+
+          if (ops.length && !remote.current) {
+            socket.emit("new-operations", {
+              editorId: id.current,
+              ops,
+              value: opts.value.toJSON(),
+              groupId
+            });
+          }
+        }}
+      />
+    </>
   );
 };
